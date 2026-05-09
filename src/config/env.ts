@@ -11,7 +11,7 @@ const envSchema = z.object({
     .default('3000') 
     .transform((val) => parseInt(val, 10)),
     //database url
-    DATABASE_URL: z.url,
+    DATABASE_URL: z.string().url(),
     // redis url
 });
 
