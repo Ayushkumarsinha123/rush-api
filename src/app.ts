@@ -1,7 +1,7 @@
 import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
-
+import eventRouter from "./modules/events/event.router.js";
 
 
 const app = express();
@@ -19,5 +19,7 @@ app.get('/health', (req : Request, res:Response) => {
     timestamp:new Date().toISOString()
   })
 })
+// Router
+app.use("/api/v1/events", eventRouter);
 
 export default app;

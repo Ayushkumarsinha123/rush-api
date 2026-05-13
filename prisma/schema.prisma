@@ -11,8 +11,46 @@ datasource db {
   provider = "postgresql"
 }
 
-model user {
+model User {
  id Int    @id @default(autoincrement())
  email String @unique
- name String
+ name String?
+ orders Order[]
+ createdAt DateTime @default(now())
 }
+
+model Event {
+  id String @id @default(uuid())
+  title String
+  description String?
+  location String
+  eventDate DateTime
+  totalCapacity Int
+  ticketsSold Int @default(0)
+  price Decimal @db.Decimal(10, 2)
+  tickets Ticket[]
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id String @id @default(uuid())
+  eventId String
+  event Event @relation(fields: [eventId], references: [id])
+  orderId String? @unique
+  order Order? @relation(fields: [orderId], references: [id])
+  status String @default("AVAILABLE") // available , sold , reserved
+  seatNumber String
+}
+model Order {
+  id          String   @id @default(uuid())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  ticket      Ticket?
+  status      String   @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  totalAmount Decimal  @db.Decimal(10, 2)
+  expiresAt   DateTime // Used for the 10-minute lock logic later
+  createdAt   DateTime @default(now())
+}
+
+
+
