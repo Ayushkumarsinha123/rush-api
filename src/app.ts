@@ -2,13 +2,17 @@ import express from "express";
 import type { Request, Response } from "express";
 import cors from "cors";
 import eventRouter from "./modules/events/event.router.js";
-
+import helmet from 'helmet';
+import { globalLimiter } from './middleware/rate-limit.middleware.js';
 
 const app = express();
 
 // global middleware
 app.use(cors());
 app.use(express.json()); // parses incoming JSON payload
+
+app.use(helmet()); // Sets security headers
+app.use(globalLimiter); // Apply global limit to all routes
 
 // heath check (aws/docker uses this to know if ypu app is alive or not)
 
