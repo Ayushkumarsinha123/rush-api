@@ -1,8 +1,10 @@
 import { OrderRepository } from "./order.repository.js";
 import { EventRepository } from "../events/event.repository.js";
+import {EventCache} from "../../cache/event.cache.js";
 
 const orderRepo = new OrderRepository();
 const eventRepo = new EventRepository();
+const eventCache = new EventCache();
 
 export class OrderService {
   async initiateBooking(userId: number, eventId: string) {
@@ -11,10 +13,15 @@ export class OrderService {
     if (!event) throw new Error("EVENT_NOT_FOUND");
 
     // Call the repository to handle the transaction
-    return await orderRepo.createTicketOrder(
+    const order = await orderRepo.createTicketOrder(
       userId, 
       eventId, 
       Number(event.price)
     );
+    // note : clear the events cache so the next "GET/events"
+    // fetches the new 'ticketsSold' count from DB
+    await eventCache.invalidate();
+
+    return order;
   }
 }
