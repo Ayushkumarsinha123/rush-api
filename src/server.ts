@@ -16,6 +16,8 @@ async function bootstrap() {
     await redis.connect();
     logger.info("connected to Redis");
 
+    
+
     // cleanup order
     initOrderCleanupTask();
 

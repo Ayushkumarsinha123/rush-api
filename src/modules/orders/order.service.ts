@@ -1,6 +1,7 @@
 import { OrderRepository } from "./order.repository.js";
 import { EventRepository } from "../events/event.repository.js";
 import {EventCache} from "../../cache/event.cache.js";
+import { queueService } from "../../queues/order.queue.js";
 
 const orderRepo = new OrderRepository();
 const eventRepo = new EventRepository();
@@ -21,6 +22,10 @@ export class OrderService {
     // note : clear the events cache so the next "GET/events"
     // fetches the new 'ticketsSold' count from DB
     await eventCache.invalidate();
+
+    //  Schedule the BullMQ worker to check this order in 10 minutes
+    // If the user doesn't pay by then, the worker will automatically release the ticket.
+    await queueService.scheduleOrderExpiry(order.id);
 
     return order;
   }
